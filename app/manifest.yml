@@ -1,0 +1,31 @@
+manifest_version: 2
+
+version:
+  name: v1
+  label: "People 360 v1 (self-contained)"
+  comment: "SAP People 360 dashboard (React + Express on SPCS) with bundled data and the SAP_PEOPLE_360_ANALYTICS Cortex Analyst semantic view."
+
+configuration:
+  log_level: INFO
+  trace_level: ALWAYS
+
+artifacts:
+  readme: README.md
+  setup_script: setup.sql
+  default_web_endpoint:
+    service: services.people_360_service
+    endpoint: people360
+  container_services:
+    images:
+      - /sc360_app_provider/images/repo/people_360:latest
+
+privileges:
+  - CREATE COMPUTE POOL:
+      description: "Create the compute pool that runs the dashboard container."
+  - BIND SERVICE ENDPOINT:
+      description: "Expose the dashboard web UI endpoint."
+  - CREATE WAREHOUSE:
+      description: "Create a warehouse used to query the bundled People data."
+
+lifecycle_callbacks:
+  version_initializer: core.version_init
