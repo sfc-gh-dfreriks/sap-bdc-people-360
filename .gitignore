@@ -13,3 +13,7 @@ connections.toml
 config.toml
 *.log
 .DS_Store
+
+# python bytecode from the presales-kit generators
+__pycache__/
+*.pyc
