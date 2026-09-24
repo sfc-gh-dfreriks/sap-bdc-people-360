@@ -40,8 +40,8 @@ import snowflake.connector
 CONN = "dfreriksdemo"
 DB = "SAP_PEOPLE_360"
 OUT = pathlib.Path("/tmp/people_facts.json")
-REPO = "https://github.com/dfreriks-snow/sap-bdc-people-360"
-PUBLIC_URL = "https://dfreriks-snow.github.io/people-360-public/"
+REPO = "https://github.com/sfc-gh-dfreriks/sap-bdc-people-360"
+PUBLIC_URL = "https://sfc-gh-dfreriks.github.io/people-360-public/"
 APP_LISTING = "ORGDATACLOUD$INTERNAL$PEOPLE_360_ORG"
 
 APP = pathlib.Path.home() / "Documents" / "SAP" / "SAP Skills" / "people_360_react"
