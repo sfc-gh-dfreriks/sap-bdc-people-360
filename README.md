@@ -56,11 +56,30 @@ python3 tools/build_presales_kit.py                                # 4 SE docume
 python3 tools/build_management_summary.py                          # 01
 python3 tools/build_demo_scripts.py                                # 02
 python3 tools/build_presales_deck.py                               # deck
+python3 ../sap-bdc-finance-360/tools/video/build.py --domain people # walkthrough
 ```
 
-Everything writes to `~/Documents/SAP/People_360_Presales_Kit/`. The screenshot step
-needs the app running (`cd ../people_360_react && npm run dev`, client on 5180,
-server on 3006) with a `server/.env` pointing at a key-pair connection.
+Everything writes to `~/Documents/SAP/People_360_Presales_Kit/`. The screenshot and
+video steps need the app running (`cd ../people_360_react && npm run dev`, client on
+5180, server on 3006) with a `server/.env` pointing at a key-pair connection.
+
+### The narrated walkthrough
+
+`SAP_People_360_Walkthrough.mp4` — 4m16s, eleven beats, built by the shared video
+pipeline owned by the Finance 360 repo. Timing is audio-led: narration is
+synthesised first and the browser then holds each page for exactly as long as its
+line takes to speak, because stretching audio to fit fixed visuals drifts within a
+minute. The script lives in that repo as `tools/video/segments_people.py`.
+
+Narration is written to be spoken rather than read. macOS `say` is the only
+synthesiser available offline, so initialisms are spaced (`S A P`, `B D C`) and
+figures are spelled out — "one hundred sixteen thousand" reads correctly aloud
+where `$116,202` does not.
+
+Four caveats are scripted into the narration rather than left for someone to find
+mid-demo: the data is synthetic (said in the first fifteen seconds), only one of
+the four analytics tables actually refreshes, the agent covers workforce only, and
+the performance window ends a year before the others.
 
 ### Nothing is transcribed by hand
 
@@ -98,8 +117,6 @@ is treated as part of the demo rather than an afterthought.
 
 ### Known gaps
 
-- **No walkthrough video.** Finance 360 and Sales 360 each ship a narrated mp4 built
-  from `tools/video/`; People would need a `segments_people.py` and narration.
 - **No Word verifier.** `verify_word_assets.py` exists in the Sales repo but is
   hardcoded to that kit's pages and personas — running it here validates Sales
   documents and reports Sales personas, so it is deliberately not vendored.
