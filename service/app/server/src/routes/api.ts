@@ -234,33 +234,44 @@ router.get("/api/recruiting", async (req, res) => {
 router.get("/api/lineage", async (_req, res) => {
   try {
     const c = (await runQuery(
-      `SELECT
-         (SELECT COUNT(*) FROM SAP_BDC_DEMO_CORE_WORKFORCE_DATA.BDCCONNECT.COREWORKFORCE_STANDARDFIELDS) AS l0_workforce,
-         (SELECT COUNT(*) FROM APP_DATA.DT_WORKFORCE_360) AS dt_workforce,
-         (SELECT COUNT(*) FROM APP_DATA.DT_PERFORMANCE) AS dt_performance,
-         (SELECT COUNT(*) FROM APP_DATA.DT_LEARNING) AS dt_learning,
-         (SELECT COUNT(*) FROM APP_DATA.DT_RECRUITING) AS dt_recruiting`))[0] as any;
+      `SELECT L0_WORKFORCE AS l0_workforce, L1_WORKFORCE AS l1_workforce, DT_WORKFORCE AS dt_workforce, DT_PERFORMANCE AS dt_performance,
+              DT_LEARNING AS dt_learning, DT_RECRUITING AS dt_recruiting, SF_PERF AS sf_perf, SF_LEARN AS sf_learn, SF_REQ AS sf_req
+       FROM APP_DATA.LINEAGE_COUNTS`))[0] as any;
+    const p = (sapSystem: string, dataProduct: string, l0Object: string, l1Object: string, rows: unknown, usage: string) =>
+      ({ sapSystem, dataProduct, l0Object, l1Object, rows, usage });
     res.json({
       app: "SAP BDC People 360",
       database: "SAP_PEOPLE_360",
-      sourceSystems: ["SAP SuccessFactors (Human Experience Management / HXM)"],
+      sourceSystems: ["SAP SuccessFactors Employee Central — Core Workforce"],
       summary:
-        "Workforce data flows from SAP SuccessFactors into Snowflake as SAP BDC zero-copy data products (L0), " +
-        "is organized into business-area passthrough views (L1), curated into gold dynamic tables and a unified " +
-        "semantic view (L2), and served to this app and the SAP People Analyst Cortex Agent — no ETL, no data movement.",
+        "Workforce data flows from SAP SuccessFactors Employee Central into Snowflake as the SAP BDC Core Workforce " +
+        "zero-copy data product (L0), is exposed as a passthrough view (L1), and is curated into the DT_WORKFORCE_360 " +
+        "dynamic table plus a semantic view (L2) that serve this app and the SAP People Analyst. Headcount, org, " +
+        "compensation, tenure, diversity and attrition are real BDC data; performance, learning and recruiting tables " +
+        "are demo enrichment keyed to the real employee IDs.",
       products: [
-        { sapSystem: "SuccessFactors — Employee Central", dataProduct: "Core Workforce Data", l0Object: "SAP_BDC_DEMO_CORE_WORKFORCE_DATA.BDCCONNECT.COREWORKFORCE_STANDARDFIELDS", l1Object: "SAP_BDC_L1.WORKFORCE", rows: c.l0_workforce },
-        { sapSystem: "SuccessFactors — Performance & Goals", dataProduct: "Performance Reviews & Ratings", l0Object: "SuccessFactors PMGM data product", l1Object: "ANALYTICS.DT_PERFORMANCE", rows: c.dt_performance },
-        { sapSystem: "SuccessFactors — Learning (LMS)", dataProduct: "Learning Enrollment & History", l0Object: "SuccessFactors LMS data product", l1Object: "ANALYTICS.DT_LEARNING", rows: c.dt_learning },
-        { sapSystem: "SuccessFactors — Recruiting (RCM)", dataProduct: "Job Requisitions & Applications", l0Object: "SuccessFactors RCM data product", l1Object: "ANALYTICS.DT_RECRUITING", rows: c.dt_recruiting },
+        p("SuccessFactors Employee Central", "Core Workforce Data — Standard Fields", "SAP_BDC_DEMO_CORE_WORKFORCE_DATA.BDCCONNECT.COREWORKFORCE_STANDARDFIELDS", "SAP_BDC_L1.WORKFORCE → ANALYTICS.DT_WORKFORCE_360", c.l0_workforce, "Headcount, org, compensation, tenure, diversity, attrition (real)"),
+        p("Demo enrichment", "Performance reviews & ratings (generated)", "— (no BDC share)", "ANALYTICS.DT_PERFORMANCE", c.dt_performance, "Performance / potential (demo, keyed to real employee IDs)"),
+        p("Demo enrichment", "Learning enrollments & completions (generated)", "— (no BDC share)", "ANALYTICS.DT_LEARNING", c.dt_learning, "Learning hours / completion (demo, keyed to real employee IDs)"),
+        p("Demo enrichment", "Job requisitions & funnel (generated)", "— (no BDC share)", "ANALYTICS.DT_RECRUITING", c.dt_recruiting, "Recruiting funnel (demo)"),
+        p("SuccessFactors Performance & Goals", "Performance Data — available, not yet wired", "SAP_BDC_DEMO_PERFORMANCE_DATA.BDCCONNECT.PERFORMANCEDATA", "— (not wired)", c.sf_perf, "Available BDC product; would replace DT_PERFORMANCE"),
+        p("SuccessFactors Learning", "Learning Enrollment — available, not yet wired", "SAP_BDC_DEMO_LEARNING_ENROLLMENT.BDCCONNECT.LEARNINGENROLLMENT", "— (not wired)", c.sf_learn, "Available BDC product; would replace DT_LEARNING"),
+        p("SuccessFactors Recruiting", "Job Requisition — available, not yet wired", "SAP_BDC_DEMO_JOB_REQUISITION_JOB_OPENING_AND_WORKFORCE_PLANNING.BDCCONNECT.JOBREQUISITION", "— (not wired)", c.sf_req, "Available BDC product; would replace DT_RECRUITING"),
+      ],
+      curated: [
+        { object: "SAP_BDC_L1.WORKFORCE", rows: c.l1_workforce },
+        { object: "ANALYTICS.DT_WORKFORCE_360 (dynamic)", rows: c.dt_workforce },
       ],
       layers: [
-        { name: "SAP Source Systems", tone: "sap", objects: ["SAP SuccessFactors HXM"] },
-        { name: "L0 — Bronze (BDC Zero-Copy)", tone: "bronze", objects: ["SAP_BDC_DEMO_CORE_WORKFORCE_DATA", "SuccessFactors PMGM / LMS / RCM products"] },
+        { name: "SAP Source Systems", tone: "sap", objects: ["SAP SuccessFactors Employee Central", "Demo enrichment (performance, learning, recruiting)"] },
+        { name: "L0 — Bronze (BDC Zero-Copy)", tone: "bronze", objects: ["SAP_BDC_DEMO_CORE_WORKFORCE_DATA.BDCCONNECT.COREWORKFORCE_STANDARDFIELDS"] },
         { name: "L1 — Silver (Passthrough Views)", tone: "silver", objects: ["SAP_BDC_L1.WORKFORCE"] },
-        { name: "L2 — Gold (Dynamic Tables + Semantic View)", tone: "gold", objects: ["ANALYTICS.DT_WORKFORCE_360", "ANALYTICS.DT_PERFORMANCE", "ANALYTICS.DT_LEARNING", "ANALYTICS.DT_RECRUITING", "SEMANTIC.SAP_PEOPLE_360_ANALYTICS"] },
+        { name: "L2 — Gold (Dynamic Tables + Semantic View)", tone: "gold", objects: ["ANALYTICS.DT_WORKFORCE_360 (dynamic)", "ANALYTICS.DT_PERFORMANCE (demo)", "ANALYTICS.DT_LEARNING (demo)", "ANALYTICS.DT_RECRUITING (demo)", "SEMANTIC.SAP_PEOPLE_360_ANALYTICS"] },
         { name: "AI + Application", tone: "ai", objects: ["AGENTS.SAP_PEOPLE_ANALYST (Cortex Agent)", "SAP BDC People 360 (React)"] },
       ],
+      note:
+        "Only Core Workforce is wired from SAP BDC today. Performance, learning and recruiting are demo enrichment keyed to " +
+        "real employee IDs; the matching SuccessFactors BDC products are listed as available, not yet wired.",
     });
   } catch (err) { res.status(500).json({ error: String(err) }); }
 });

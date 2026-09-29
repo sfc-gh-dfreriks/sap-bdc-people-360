@@ -123,3 +123,18 @@ SELECT
   MOVEMENTIN                               AS MOVEMENT_IN,
   MOVEMENTOUT                              AS MOVEMENT_OUT
 FROM SAP_PEOPLE_360.SAP_BDC_L1.WORKFORCE;
+
+-- Lineage row counts snapshot (bundled into the Native App for the BDC Sources & Lineage page).
+-- DT_PERFORMANCE / DT_LEARNING / DT_RECRUITING are demo enrichment (no BDC share); SF_* are available,
+-- not-yet-wired SuccessFactors BDC products.
+create or replace table SAP_PEOPLE_360.ANALYTICS.LINEAGE_COUNTS as
+select
+  (select count(*) from SAP_BDC_DEMO_CORE_WORKFORCE_DATA.BDCCONNECT.COREWORKFORCE_STANDARDFIELDS) as L0_WORKFORCE,
+  (select count(*) from SAP_PEOPLE_360.SAP_BDC_L1.WORKFORCE) as L1_WORKFORCE,
+  (select count(*) from SAP_PEOPLE_360.ANALYTICS.DT_WORKFORCE_360) as DT_WORKFORCE,
+  (select count(*) from SAP_PEOPLE_360.ANALYTICS.DT_PERFORMANCE) as DT_PERFORMANCE,
+  (select count(*) from SAP_PEOPLE_360.ANALYTICS.DT_LEARNING) as DT_LEARNING,
+  (select count(*) from SAP_PEOPLE_360.ANALYTICS.DT_RECRUITING) as DT_RECRUITING,
+  (select count(*) from SAP_BDC_DEMO_PERFORMANCE_DATA.BDCCONNECT.PERFORMANCEDATA) as SF_PERF,
+  (select count(*) from SAP_BDC_DEMO_LEARNING_ENROLLMENT.BDCCONNECT.LEARNINGENROLLMENT) as SF_LEARN,
+  (select count(*) from SAP_BDC_DEMO_JOB_REQUISITION_JOB_OPENING_AND_WORKFORCE_PLANNING.BDCCONNECT.JOBREQUISITION) as SF_REQ;
