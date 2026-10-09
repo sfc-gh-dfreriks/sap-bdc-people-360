@@ -4,7 +4,7 @@ import { formatNumber } from '@/lib/utils';
 import MetricCard from '@/components/MetricCard';
 import { UserPlus, Clock as ClockIcon, FileText } from 'lucide-react';
 import ChartCard from '@/components/ChartCard';
-import ReactECharts from 'echarts-for-react';
+import ReactECharts from '@/components/Chart';
 
 const PALETTE = ['#06b6d4', '#10b981', '#ef4444'];
 

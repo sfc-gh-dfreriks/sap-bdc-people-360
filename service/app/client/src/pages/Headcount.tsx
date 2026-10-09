@@ -3,7 +3,7 @@ import { useQuery } from '@/hooks/useQuery';
 import { fetchHeadcount } from '@/lib/api';
 import { formatNumber } from '@/lib/utils';
 import ChartCard from '@/components/ChartCard';
-import ReactECharts from 'echarts-for-react';
+import ReactECharts from '@/components/Chart';
 
 const PALETTE = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899'];
 const bar = (rows: any[], horizontal = true) => ({

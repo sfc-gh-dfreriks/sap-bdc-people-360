@@ -3,7 +3,7 @@ import { useQuery } from '@/hooks/useQuery';
 import { fetchPerformance } from '@/lib/api';
 import { formatNumber } from '@/lib/utils';
 import ChartCard from '@/components/ChartCard';
-import ReactECharts from 'echarts-for-react';
+import ReactECharts from '@/components/Chart';
 
 const PALETTE = ['#ef4444', '#f59e0b', '#facc15', '#10b981', '#06b6d4'];
 

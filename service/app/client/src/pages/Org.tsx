@@ -2,7 +2,7 @@ import { useFilters } from '@/hooks/useFilters';
 import { useQuery } from '@/hooks/useQuery';
 import { fetchOrg } from '@/lib/api';
 import ChartCard from '@/components/ChartCard';
-import ReactECharts from 'echarts-for-react';
+import ReactECharts from '@/components/Chart';
 
 const PALETTE = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899'];
 

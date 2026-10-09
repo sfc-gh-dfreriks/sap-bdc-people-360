@@ -4,7 +4,7 @@ import { fetchCompensation } from '@/lib/api';
 import { formatDollar } from '@/lib/utils';
 import ChartCard from '@/components/ChartCard';
 import DataTable from '@/components/DataTable';
-import ReactECharts from 'echarts-for-react';
+import ReactECharts from '@/components/Chart';
 
 export default function Compensation() {
   const { selectedDepartments, selectedCompanies } = useFilters();
