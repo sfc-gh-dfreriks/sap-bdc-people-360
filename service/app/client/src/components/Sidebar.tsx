@@ -1,13 +1,13 @@
 import {
   LayoutDashboard, Users, PieChart, DollarSign, TrendingDown, Network, Table2, Bot, Check,
-  Star, GraduationCap, UserPlus, GitBranch,
+  Star, GraduationCap, UserPlus, GitBranch, UserCog,
 } from 'lucide-react';
 import { useFilters } from '@/hooks/useFilters';
 import { cn } from '@/lib/utils';
 
 export type PageId =
   | 'overview' | 'headcount' | 'diversity' | 'compensation'
-  | 'attrition' | 'org' | 'performance' | 'learning' | 'recruiting' | 'employees' | 'lineage' | 'analyst';
+  | 'attrition' | 'org' | 'performance' | 'learning' | 'recruiting' | 'onboarding' | 'employees' | 'lineage' | 'analyst';
 
 export interface NavItem { id: PageId; label: string; icon: React.ElementType; }
 
@@ -20,6 +20,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'performance', label: 'Performance', icon: Star },
   { id: 'learning', label: 'Learning', icon: GraduationCap },
   { id: 'recruiting', label: 'Recruiting', icon: UserPlus },
+  { id: 'onboarding', label: 'Onboarding Scenario', icon: UserCog },
   { id: 'org', label: 'Org & Span', icon: Network },
   { id: 'employees', label: 'Employees', icon: Table2 },
   { id: 'lineage', label: 'BDC Sources & Lineage', icon: GitBranch },
@@ -67,7 +68,7 @@ export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col bg-gradient-to-b from-sf-dark to-sf-deeper text-white">
       <div className="flex flex-col gap-1.5 border-b border-white/10 px-5 py-4">
-        <img src="/snowflake_logo.svg" alt="Snowflake" className="h-7 w-auto self-start" />
+        <img src={`${import.meta.env.BASE_URL}snowflake_logo.svg`} alt="Snowflake" className="h-7 w-auto self-start" />
         <span className="text-lg font-bold tracking-tight text-white">SAP BDC People 360</span>
       </div>
       <nav className="flex-1 overflow-y-auto px-3 py-3">

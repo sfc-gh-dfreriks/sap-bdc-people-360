@@ -338,6 +338,40 @@ def s11_org(prs, f, shots):
     return s
 
 
+def s11b_onboarding(prs, f, shots):
+    h, k = f["onb_hire"], f["onb_kit"]
+    s = content(prs, "HR onboarding scenario", "From insight to action: a hire meets a backorder")
+    pic = shots.get("onb_kit") or shots.get("onboarding")
+    if pic:
+        picture(s, pic, LEFT, TOP, 5.9, 3.4)
+    stat(s, LEFT + 6.1, TOP, 3.0, 0.85, f"${h['daily_loaded']:,}", "loaded cost per idle day",
+         f"{h['title']}, ${h['salary']:,} from {h['peers']} peers", accent=SF_BLUE)
+    stat(s, LEFT + 6.1, TOP + 0.95, 3.0, 0.85, f"{k['lost_workdays']} days", "without a laptop",
+         f"{k['lead_days']}-day backorder ≈ ${k['idle_cost']:,}", accent=RED)
+    card(s, LEFT + 6.1, TOP + 1.95, 3.0, 1.45, "what is real", [
+        ("Pay and peers come from the SAP BDC workforce share. Kits, stock, suppliers and "
+         "benefits are demo enrichment.", 10, False, DK1, 0)], accent=DK2)
+    return s
+
+
+def s11c_sourcing(prs, f, shots):
+    r = f["onb_replay"]
+    s = content(prs, "Alternative sourcing and write-back", "Live web search, priced offers, a costed decision")
+    pic = shots.get("onb_alts")
+    if pic:
+        picture(s, pic, LEFT, TOP, 5.9, 3.4)
+    card(s, LEFT + 6.1, TOP, 3.0, 1.30, "how offers are found", [
+        ("Live web search; Cortex AI_COMPLETE reads the pages. No price on the cited page, "
+         "no offer.", 10.5, False, DK1, 0)], accent=TEAL)
+    card(s, LEFT + 6.1, TOP + 1.42, 3.0, 1.0, "how they are ranked", [
+        ("Total impact = hardware + idle days × daily cost.", 10.5, False, DK1, 0)], accent=SF_BLUE)
+    card(s, LEFT + 6.1, TOP + 2.55, 3.0, 0.85, "write-back", [
+        ("Simulated: SuccessFactors OData payloads stored in Snowflake.", 10, False, DK1, 0)], accent=VIOLET)
+    note(s, f"Offers are live and change every run. Example shown: recorded {r['recorded']}, "
+            f"{r['pages']} pages, {r['offers']} offers.")
+    return s
+
+
 def s12_agent(prs, f, shots):
     sv = next(iter(f["semantic_view_detail"].values()))
     s = content(prs, "Ask the Agent", "Plain English, with the SQL shown")
@@ -455,6 +489,8 @@ def main():
         s09_attrition(prs, f, shots),
         s10_compensation(prs, f, shots),
         s11_org(prs, f, shots),
+        s11b_onboarding(prs, f, shots),
+        s11c_sourcing(prs, f, shots),
         s12_agent(prs, f, shots),
         s13_arch_section(prs),
         s14_dataflow(prs, f),

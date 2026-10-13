@@ -30,7 +30,24 @@ sap-bdc-people-360/
 ## The app
 A React dashboard: **Overview, Headcount, Diversity, Compensation, Attrition,
 Performance, Learning, Recruiting, Org, Employees, Lineage**, plus an **Ask the
-Agent** page (Cortex Analyst over the bundled `SAP_PEOPLE_360_ANALYTICS` view).
+Agent** page (Cortex Analyst over the bundled `SAP_PEOPLE_360_ANALYTICS` view) and an
+**Onboarding Scenario**.
+
+### HR onboarding scenario
+A hire made from SuccessFactors data meets a supply-chain disruption, and the app fixes it:
+
+1. **New hire** — offer derived from peers (e.g. Senior Engineer, US Operations: 36 peers, $127,200, grade 5, $636 loaded cost per working day).
+2. **Equipment check** — the Engineering laptop 16" is backordered, 42 days out → 17 idle workdays ≈ $10,812.
+3. **Alternative sourcing** — live web search; Cortex `AI_COMPLETE` extracts offers from the result pages and keeps one only if its price is on the cited page. Ranked by total impact (hardware + idle days × daily cost).
+4. **Substitute & write back** — SuccessFactors OData payloads (PerPerson / EmpJob / EmpCompensation / equipment request) plus the sourcing decision.
+
+| Surface | Behaviour |
+|---|---|
+| Local app | Live search (Tavily if `TAVILY_API_KEY` is set, else keyless DuckDuckGo + page fetch); writes to `SAP_PEOPLE_360.ONBOARDING` |
+| Native App | Live search once the consumer approves the app specification **Onboarding: web search for equipment alternatives** (app-created EAI over a fixed host list); writes to the app's own `ONBOARDING` schema |
+| github.io | Replays one recorded run (2026-10-13: 15 pages, 8 offers), inputs fixed — `scripts/record-onboarding.mjs` in the app re-records it |
+
+Caveats, stated in the kit: the write-back is **simulated** (payloads stored in Snowflake, not posted to a tenant); benefits, kits, IT stock and preferred sourcing are **demo enrichment**, not SAP data; offers are live and change every run.
 
 ## Live reference deployment
 Region-scoped organization listing (`ORGDATACLOUD$INTERNAL$PEOPLE_360_ORG`), 3 regions:
@@ -65,7 +82,8 @@ video steps need the app running (`cd ../people_360_react && npm run dev`, clien
 
 ### The narrated walkthrough
 
-`SAP_People_360_Walkthrough.mp4` — 4m16s, eleven beats, built by the shared video
+`SAP_People_360_Walkthrough.mp4` — 5m39s, seventeen beats (six of them the live
+onboarding scenario), built by the shared video
 pipeline owned by the Finance 360 repo. Timing is audio-led: narration is
 synthesised first and the browser then holds each page for exactly as long as its
 line takes to speak, because stretching audio to fit fixed visuals drifts within a
@@ -75,6 +93,9 @@ Narration is written to be spoken rather than read. macOS `say` is the only
 synthesiser available offline, so initialisms are spaced (`S A P`, `B D C`) and
 figures are spelled out — "one hundred sixteen thousand" reads correctly aloud
 where `$116,202` does not.
+
+The onboarding beats name no vendor or price because the search is live, and say
+aloud that the write-back is simulated and the kit/supplier data is demo enrichment.
 
 Four caveats are scripted into the narration rather than left for someone to find
 mid-demo: the data is synthetic (said in the first fifteen seconds), only one of
@@ -123,6 +144,9 @@ is treated as part of the demo rather than an afterthought.
 - The semantic view reports `extension: null`, where the Supply Chain and Ontology
   views carry `CA`/`AI`. Cortex Analyst works because the app passes the view
   explicitly, but verify this before attaching AI products to a data-share listing.
+- The Native App's onboarding search reaches only the hosts in its network rule
+  (search endpoint plus a fixed retailer/OEM list); result pages elsewhere are skipped,
+  so EU/APAC searches may return fewer priced offers than the local app.
 - People 360 publishes the Native App listing only. There is no data-share listing,
   so there is no mount-the-tables route from the Marketplace.
 

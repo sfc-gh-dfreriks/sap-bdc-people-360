@@ -21,6 +21,7 @@ from docx.shared import Pt
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
+import onboarding_content as onb  # noqa: E402
 from docx_kit import (  # noqa: E402
     GREY, SAP_NAVY, SNOW_BLUE, body, bullet, callout, h1, setup_page, table,
 )
@@ -124,6 +125,8 @@ def main() -> int:
         ],
         widths=[1.6, 5.1],
     )
+
+    onb.docx_section(doc, F, "From insight to action: the HR onboarding scenario")
 
     h1(doc, "Natural-language questions, and their current limit")
     body(

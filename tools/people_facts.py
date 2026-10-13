@@ -50,6 +50,8 @@ API_ROUTES = APP / "server" / "src" / "routes" / "api.ts"
 ANALYST_SVC = APP / "server" / "src" / "services" / "analyst.ts"
 ANALYST_PAGE = APP / "client" / "src" / "pages" / "Analyst.tsx"
 APP_DEV_URL = "http://localhost:3006"
+LOCAL_API = APP_DEV_URL
+REPLAY = APP / "client" / "public" / "data" / "onboarding_replay.json"   # recorded run (scripts/record-onboarding.mjs)
 
 # The regions People 360 is published into. Verified with SHOW LISTINGS per region.
 REGION_CONNS = ["dfreriksdemo", "dfreriks_eu_demo", "dfreriks_apac_demo"]
@@ -378,7 +380,33 @@ def collect(cur) -> Facts:
     f.put("kpis_source", "application" if usable else "sql_fallback",
           "which source the documents used")
 
-    f.put("public_url", PUBLIC_URL, "constant")
+    # ---- HR onboarding scenario ---------------------------------------------
+    # The scenario's numbers are what the app computes, so read them from the running
+    # local API (which queries this account) rather than re-deriving them here.
+    f.sql_rows("onboarding_tables", """
+        SELECT TABLE_NAME, ROW_COUNT FROM SAP_PEOPLE_360.INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_SCHEMA = 'ONBOARDING' ORDER BY 1""", "SAP_PEOPLE_360.INFORMATION_SCHEMA.TABLES (ONBOARDING)")
+    import urllib.request, urllib.parse
+    def api(path):
+        with urllib.request.urlopen(f"{LOCAL_API}/api/onboarding{path}", timeout=60) as r:
+            return json.loads(r.read())
+    start = (dt.date.today() + dt.timedelta(days=17)).isoformat()
+    tpl = api("/template?" + urllib.parse.urlencode(dict(title="Senior Engineer", company="US Operations", department="Engineering")))
+    kit = api("/kit?" + urllib.parse.urlencode(dict(roleFamily=tpl["roleFamily"], company="US Operations", startDate=start)))["items"]
+    lap = next(k for k in kit if k["blocking"])
+    src = f"{LOCAL_API}/api/onboarding (Senior Engineer, US Operations, start today+17)"
+    f.put("onb_hire", dict(title=tpl["title"], company=tpl["company"], peers=tpl["peers"], salary=tpl["salary"],
+                           pay_grade=tpl["pay_grade"], benefits_load_pct=tpl["benefits"]["benefits_load_pct"],
+                           loaded_annual=tpl["loadedAnnualCost"], daily_loaded=tpl["dailyLoadedCost"], currency=tpl["currency"]), src)
+    f.put("onb_kit", dict(items=len(kit), on_time=sum(not k["blocking"] for k in kit), blocked_item=lap["item_name"],
+                          blocked_spec=lap["item_spec"], unit_cost=lap["unit_cost"], lead_days=lap["current_lead_days"],
+                          status=lap["supply_status"], lost_workdays=lap["lostWorkdays"],
+                          idle_cost=round(lap["lostWorkdays"] * tpl["dailyLoadedCost"])), src)
+    rp = json.loads(REPLAY.read_text())
+    alts = rp["search"]["alternatives"]; ch = next(a for a in alts if a["id"] == rp["chosenId"])
+    f.put("onb_replay", dict(recorded=rp["recordedAt"][:10], pages=len(rp["search"]["sources"]), offers=len(alts),
+                             chosen=f"{ch['vendor']} {ch['model']}", chosen_cost=ch["totalCost"], chosen_lead=ch["leadDays"],
+                             net_benefit=round(ch["netBenefit"]), request_id=rp["result"]["requestId"]), str(REPLAY))
 
     f.put("public_url", PUBLIC_URL, "constant")
     f.put("app_listing", APP_LISTING, "constant")

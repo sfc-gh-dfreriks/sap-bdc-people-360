@@ -25,10 +25,10 @@ import time
 
 from deploy_native_app import APP, APP_DIR, FILES, PKG, connect
 
-VERSION = "V1"
+VERSION = "V2"   # V2 adds CREATE EXTERNAL ACCESS INTEGRATION (onboarding web search); privilege changes need a version
 
 
-def upgrade(target, wh, label):
+def upgrade(target, wh, label, new_version=False):
     conn = connect(target, warehouse=wh)
     cur = conn.cursor()
     cur.execute(f"USE WAREHOUSE {wh}")
@@ -38,9 +38,17 @@ def upgrade(target, wh, label):
         cur.execute(f"PUT 'file://{p}' @{PKG}.PUBLIC.APP_STAGE AUTO_COMPRESS=FALSE OVERWRITE=TRUE")
     print(f"{target}: artifacts staged")
 
-    cur.execute(f"ALTER APPLICATION PACKAGE {PKG} ADD PATCH FOR VERSION {VERSION} "
-                f"USING '@{PKG}.PUBLIC.APP_STAGE' LABEL = '{label}'")
-    row = cur.fetchone()
+    if new_version:
+        # A manifest privilege change cannot ship as a patch (manifest_version 2): register a version,
+        # then make it available on the DEFAULT release channel before pointing the directive at it.
+        cur.execute(f"ALTER APPLICATION PACKAGE {PKG} REGISTER VERSION {VERSION} "
+                    f"USING '@{PKG}.PUBLIC.APP_STAGE' LABEL = '{label}'")
+        row = cur.fetchone()
+        cur.execute(f"ALTER APPLICATION PACKAGE {PKG} MODIFY RELEASE CHANNEL DEFAULT ADD VERSION {VERSION}")
+    else:
+        cur.execute(f"ALTER APPLICATION PACKAGE {PKG} ADD PATCH FOR VERSION {VERSION} "
+                    f"USING '@{PKG}.PUBLIC.APP_STAGE' LABEL = '{label}'")
+        row = cur.fetchone()
     cur.execute(f"SHOW VERSIONS IN APPLICATION PACKAGE {PKG}")
     cols = [d[0] for d in cur.description]
     patch = max(int(dict(zip(cols, r))["patch"]) for r in cur.fetchall()
@@ -71,6 +79,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--target", required=True)
     ap.add_argument("--warehouse", default="COMPUTE_WH")
-    ap.add_argument("--label", default="BDC Sources & Lineage")
+    ap.add_argument("--label", default="HR onboarding scenario")
+    ap.add_argument("--new-version", action="store_true", help=f"register {VERSION} instead of adding a patch")
     a = ap.parse_args()
-    upgrade(a.target, a.warehouse, a.label)
+    upgrade(a.target, a.warehouse, a.label, a.new_version)

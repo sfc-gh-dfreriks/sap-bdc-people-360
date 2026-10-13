@@ -20,7 +20,11 @@ no pipelines, full SAP context preserved.
    - "What is headcount by department?"
    - "What is our attrition rate and top termination reasons?"
    - "Show pay equity by gender and pay grade."
-8. **Recap** — zero-ETL, governed, AI-ready, one-click distribution.
+8. **Onboarding Scenario** (+3 min, for HR ops / IT / procurement) — the offer is
+   derived from 36 peers; the laptop is backordered 42 days (17 idle workdays ≈
+   $10,812); search the web, pick an offer on total impact, write back to
+   SuccessFactors (simulated).
+9. **Recap** — zero-ETL, governed, AI-ready, one-click distribution.
 
 ## Key points to land
 - Data is **already inside Snowflake** — no ETL, no waiting.
@@ -31,4 +35,6 @@ no pipelines, full SAP context preserved.
 ## Do / Don't
 - **Do** ask the agent a real question live; lead with people outcomes.
 - **Don't** pre-load canned answers or dwell on architecture/SQL.
+- **Don't** quote a laptop vendor or price from a previous run — the search is live.
+- **Do** say the onboarding write-back is simulated and the kit/supplier data is demo enrichment.
 - **Don't** promise cross-region magic — each region is its own governed install.

@@ -66,6 +66,20 @@ Locator: `ORGDATACLOUD$INTERNAL$PEOPLE_360_ORG`.
 | `app/snowflake.yml` | Snowflake CLI project (`PEOPLE_360_PKG` / `PEOPLE_360_APP`) |
 | `service/app/` | React (Vite) client + Express server + Dockerfile |
 
+## Onboarding scenario (Native App)
+
+- Data: `migrate_data.py` bundles `BENEFITS_PLAN`, `EQUIPMENT_KIT`, `IT_INVENTORY`, `PREFERRED_SOURCING`
+  (from `SAP_PEOPLE_360.ONBOARDING`); `setup.sql` exposes them as `APP_DATA` views.
+- Write-back: `setup.sql` creates `SF_WRITEBACK_EMPHIRE`, `SF_WRITEBACK_EQUIPMENT_REQUEST`, `SOURCING_DECISION`
+  in the app's **non-versioned** `ONBOARDING` schema (`CREATE TABLE IF NOT EXISTS`, so rows survive upgrades).
+- Egress: network rule `SERVICES.ONBOARDING_WEB_RULE` → EAI `PEOPLE_360_ONBOARDING_WEB_EAI` → app specification
+  `ONBOARDING_WEB_SPEC` (`TYPE = EXTERNAL_ACCESS`; `HOST_PORTS` must equal the rule's `VALUE_LIST`). `version_init`
+  attaches the EAI to the service; `callbacks.on_spec_approved_or_declined` (manifest `specification_action`)
+  re-attaches and restarts the service on approval.
+- Approve as consumer: `SHOW SPECIFICATIONS IN APPLICATION PEOPLE_360_APP;` then
+  `ALTER APPLICATION PEOPLE_360_APP APPROVE SPECIFICATION ONBOARDING_WEB_SPEC SEQUENCE_NUMBER = <n>;`
+- Adding a host: edit the list in `setup.sql` (both places) — the consumer must re-approve the spec.
+
 ## Cortex access
 ```sql
 GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO APPLICATION PEOPLE_360_APP;

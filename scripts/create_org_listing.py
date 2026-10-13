@@ -24,8 +24,12 @@ PKG = "PEOPLE_360_PKG"
 LISTING = "PEOPLE_360_ORG"
 CONTACT = os.environ.get("LISTING_CONTACT", "you@example.com")
 DESC = ("Self-contained SAP People 360 dashboard (React + Express on Snowpark "
-        "Container Services) with bundled data and a Cortex Analyst 'Ask the Agent' "
-        "page powered by the SAP_PEOPLE_360_AGENT semantic model. No data setup required.")
+        "Container Services) with bundled SAP SuccessFactors workforce data, a Cortex Analyst "
+        "'Ask the Agent' page over the SAP_PEOPLE_360_ANALYTICS semantic view, and an HR "
+        "onboarding scenario: a hire made from SuccessFactors data, a backordered laptop, "
+        "live web sourcing of a priced substitute with Cortex AI_COMPLETE, and a simulated "
+        "SuccessFactors write-back. No data setup required; approve the app's "
+        "'Onboarding: web search' specification to run the scenario live. Synthetic data.")
 
 
 def connect(conn_name, **kw):
@@ -73,10 +77,32 @@ resharing:
     cur.close(); conn.close()
 
 
+def update(target, wh):
+    """Refresh the description on the live listing, keeping its contacts, targets and regions."""
+    import yaml
+    conn = connect(target, warehouse=wh)
+    cur = conn.cursor()
+    cur.execute(f"DESCRIBE LISTING {LISTING}")
+    cols = [c[0].lower() for c in cur.description]
+    row = dict(zip(cols, cur.fetchone()))
+    man = yaml.safe_load(row["manifest_yaml"])
+    before = man.get("description", "")
+    man["description"] = DESC
+    cur.execute(f"ALTER LISTING {LISTING} AS $$\n{yaml.safe_dump(man, sort_keys=False, width=1000)}$$")
+    cur.execute(f"DESCRIBE LISTING {LISTING}")
+    cols = [c[0].lower() for c in cur.description]
+    after = dict(zip(cols, cur.fetchone()))
+    ok = (yaml.safe_load(after["manifest_yaml"]) or {}).get("description") == DESC   # YAML may wrap the text
+    print(f"{target}: {LISTING} description {'updated' if ok else 'NOT updated'} "
+          f"(was {len(before)} chars, now {len(DESC)}) | state={after.get('state')}")
+    cur.close(); conn.close()
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--target", required=True)
-    ap.add_argument("--region", required=True, help="e.g. PUBLIC.AWS_US_WEST_2")
+    ap.add_argument("--region", help="e.g. PUBLIC.AWS_US_WEST_2 (create only)")
+    ap.add_argument("--update", action="store_true", help="refresh the description on the existing listing")
     ap.add_argument("--warehouse", default="COMPUTE_WH")
     a = ap.parse_args()
-    create(a.target, a.region, a.warehouse)
+    update(a.target, a.warehouse) if a.update else create(a.target, a.region, a.warehouse)

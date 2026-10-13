@@ -10,6 +10,7 @@ import Org from '@/pages/Org';
 import Performance from '@/pages/Performance';
 import Learning from '@/pages/Learning';
 import Recruiting from '@/pages/Recruiting';
+import Onboarding from '@/pages/Onboarding';
 import Employees from '@/pages/Employees';
 import Lineage from '@/pages/Lineage';
 import Analyst from '@/pages/Analyst';
@@ -24,6 +25,7 @@ const PAGE_COMPONENTS: Record<string, React.FC> = {
   performance: Performance,
   learning: Learning,
   recruiting: Recruiting,
+  onboarding: Onboarding,
   employees: Employees,
   lineage: Lineage,
   analyst: Analyst,

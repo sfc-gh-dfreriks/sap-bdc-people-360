@@ -25,6 +25,7 @@ from docx.shared import Pt
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
+import onboarding_content as onb  # noqa: E402
 from docx_kit import (  # noqa: E402
     AMBER,
     GREEN,
@@ -54,6 +55,7 @@ PAGE_PURPOSE = {
     "Performance": "Review rating distribution and coverage",
     "Learning": "Course completions, scores and status",
     "Recruiting": "Requisitions by status, open versus filled",
+    onb.PAGE: onb.PURPOSE,
     "Org & Span": "Manager span of control and reporting depth",
     "Employees": "The record-level table, filterable",
     "BDC Sources & Lineage": "Which SAP BDC objects feed each layer",
@@ -184,7 +186,7 @@ def build_start_here(F):
              "You are demoing this week. Positioning, a ten-minute path, the eight "
              "agent questions, discovery questions, objections. Start here.", "10 min"],
             ["02_Demo_Scripts_by_Persona.docx",
-             "You know who is in the room — CHRO, HR ops, talent, finance, architect. "
+             "You know who is in the room — CHRO, HR ops, talent, finance, architect, onboarding. "
              "Each script opens on a different page.", "per script"],
             ["01_Management_Summary.docx",
              "Leaving something with the customer, or briefing an exec beforehand. "
@@ -201,6 +203,8 @@ def build_start_here(F):
     )
 
     agent_scope_callout(doc, F)
+
+    onb.docx_section(doc, F, "New: the HR onboarding scenario")
 
     h1(doc, "One thing that is different about HR demos")
     body(
@@ -306,6 +310,13 @@ def build_quick_start(F):
         ],
         widths=[0.3, 1.5, 4.2, 0.7],
     )
+
+    h2(doc, "Add three minutes: the HR onboarding scenario")
+    body(doc, "Run it after Org & Span when the room is HR operations, IT or procurement — it is the "
+              "page that turns reporting into an action. Use the inputs the page opens with.")
+    table(doc, ["Click", "Say"], [list(x) for x in onb.talk_track(F)], widths=[2.0, 4.7])
+    for c in onb.CAVEATS:
+        bullet(doc, c, size=9.5)
 
     h2(doc, "The eight questions the agent ships with")
     body(doc, "Read from the app's source, so these are exactly the chips on screen.")
@@ -521,6 +532,19 @@ def build_architecture(F):
         f"first rather than assuming parity with the other domains.",
     )
 
+    h1(doc, "Onboarding scenario objects")
+    rows = [[r["TABLE_NAME"], str(r["ROW_COUNT"]),
+             "write-back (simulated SuccessFactors)" if r["TABLE_NAME"].startswith(("SF_", "SOURCING")) else "reference (demo enrichment)"]
+            for r in F["onboarding_tables"]]
+    table(doc, ["SAP_PEOPLE_360.ONBOARDING", "Rows", "Role"], rows, widths=[3.0, 0.8, 2.9])
+    bullet(doc, "Native App: the four reference tables are bundled (APP_DATA views); the three write-back tables are created "
+                "in the app's non-versioned ONBOARDING schema so rows survive upgrades.")
+    bullet(doc, "Native App egress: an app-created external access integration (PEOPLE_360_ONBOARDING_WEB_EAI) over a network "
+                "rule listing the search endpoint and retailer/OEM hosts, declared as the EXTERNAL_ACCESS app specification "
+                "'Onboarding: web search for equipment alternatives'. A specification_action callback restarts the service on approval.")
+    bullet(doc, "Search: Tavily when TAVILY_API_KEY is set, otherwise keyless DuckDuckGo plus a fetch of each result page. "
+                "Offers are extracted with Cortex AI_COMPLETE (claude-sonnet-4-5) and dropped unless the price is on the cited page.")
+
     out = KIT / "05_Architecture_and_Install.docx"
     doc.save(out)
     return out
@@ -548,7 +572,8 @@ def build_setup(F):
              "bundled in. No grants, no warehouse sizing, no data setup.",
              f"{F['app_listing']} — region-scoped, install the one for your region"],
             ["Public static build", "A credential-free browser build for rehearsal or "
-             "async sharing. No Snowflake behind it, so Ask the Agent will not answer.",
+             "async sharing. No Snowflake behind it, so Ask the Agent will not answer and "
+             "the onboarding scenario replays one recorded run.",
              F["public_url"]],
             ["Your own account", "Run the SQL, then demo through Snowflake "
              "Intelligence with no app at all.", "See 05_Architecture_and_Install"],
@@ -561,6 +586,17 @@ def build_setup(F):
         "360, there is no separate data-share listing today, so there is no "
         "mount-the-tables-in-your-own-account route from the Marketplace.",
     )
+
+    h1(doc, "Turning on the live onboarding scenario in the Native App")
+    body(doc, "The onboarding scenario searches the public web for substitute equipment, so the app asks "
+              "for outbound network access. Nothing else in the app needs it, and no People data is sent.")
+    bullet(doc, "After install, open the app in Snowsight → **Security** (app specifications) and approve "
+                "**Onboarding: web search for equipment alternatives**. The app restarts its service to apply it.")
+    bullet(doc, "The access is limited to the search endpoint and a fixed list of retailer and OEM sites; "
+                "pages outside that list are skipped, not fetched.")
+    bullet(doc, "Decline it and every other page still works; the onboarding page then reports that live "
+                "search is unavailable.")
+    bullet(doc, "Write-back rows land in the app's own ONBOARDING schema and survive upgrades.")
 
     h1(doc, "Where it is published")
     rows = []

@@ -231,7 +231,8 @@ def s04_app(prs, f, shots):
           [(f"· {p}", 9.5, False, DK1, 6) for p in pages[:half]])
     stack(s, LEFT + 7.65, TOP + 0.30, 1.5, 3.0,
           [(f"· {p}", 9.5, False, DK1, 6) for p in pages[half:]])
-    note(s, "Department and Company filters apply across all pages. Shown: Workforce Overview.")
+    note(s, "New: Onboarding Scenario — hire, backordered laptop, live web sourcing, simulated "
+            "SuccessFactors write-back. Shown: Workforce Overview.")
     return s
 
 
@@ -319,14 +320,15 @@ def s09_caveats(prs, f):
         ("SuccessFactors field structure", "Real structure, modelled on BDC workforce products", SF_BLUE, DK1),
         ("The people, pay and ratings", f"Synthetic — demo database, IDs like {ids}", RED, RED),
         ("Names anywhere in the analytics layer", "None surfaced", TEAL, DK1),
+        ("Onboarding kits, stock, suppliers; write-back", "Demo enrichment; write-back simulated in Snowflake", RED, RED),
         ("Refresh", f"{len(f['dynamic_tables'])} of {len(f['analytics_objects'])} gold tables is dynamic", RED, RED),
     ]
     y = TOP
     for label, status, accent, text_colour in rows:
-        box(s, LEFT, y, FULLW, 0.50, LIGHT_BG, accent)
-        stack(s, LEFT + 0.28, y + 0.13, 4.6, 0.26, [(label, 10.5, True, DK1, 0)])
-        stack(s, LEFT + 5.0, y + 0.13, 4.0, 0.26, [(status, 10.5, False, text_colour, 0)])
-        y += 0.56
+        box(s, LEFT, y, FULLW, 0.44, LIGHT_BG, accent)
+        stack(s, LEFT + 0.28, y + 0.10, 4.6, 0.26, [(label, 10.5, True, DK1, 0)])
+        stack(s, LEFT + 5.0, y + 0.10, 4.0, 0.26, [(status, 10.5, False, text_colour, 0)])
+        y += 0.50
     card(s, LEFT, y + 0.04, FULLW, 0.62, "data windows differ by table", [
         (window_line(f), 9.5, False, DK1, 0)], accent=DK2)
     note(s, "Performance reviews stop a year before the rest — the window most likely "

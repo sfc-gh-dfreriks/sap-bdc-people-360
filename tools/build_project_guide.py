@@ -32,6 +32,7 @@ from docx.shared import Pt
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
+import onboarding_content as onb  # noqa: E402
 from docx_kit import (  # noqa: E402
     GREY, SAP_NAVY, SNOW_BLUE, body, bullet, callout, h1, h2, setup_page, table,
 )
@@ -50,6 +51,7 @@ PAGE_PURPOSE = {
     "Performance": "Review rating distribution and coverage",
     "Learning": "Course completions, scores and status",
     "Recruiting": "Requisitions by status, open versus filled",
+    onb.PAGE: onb.PURPOSE,
     "Org & Span": "Manager span of control and reporting depth",
     "Employees": "The record-level table, filterable",
     "BDC Sources & Lineage": "Which SAP BDC objects feed each layer",
@@ -300,6 +302,8 @@ def main() -> int:
     )
     body(doc, "Department and Company filters apply across every page. The lineage page reads the BDC share directly, which is the zero-copy proof inside the app rather than in a diagram.")
 
+    onb.docx_section(doc, F, "HR Onboarding Scenario", level=2)
+
     h2(doc, "What reads what")
     table(
         doc,
@@ -370,6 +374,9 @@ def main() -> int:
             ["1", "Snowsight → Data Products → Marketplace, filtered to your organization"],
             ["2", f"Find {F['app_listing']} for your region and install"],
             ["3", "Open the app. Data is bundled — no grants, no warehouse sizing, no load step"],
+            ["4", "Optional, for the live onboarding scenario: app → Security → approve the specification "
+                  "'Onboarding: web search for equipment alternatives' (outbound access to the search endpoint "
+                  "and a fixed retailer list). The service restarts to apply it"],
         ],
         widths=[0.5, 6.2],
     )

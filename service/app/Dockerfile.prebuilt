@@ -1,0 +1,18 @@
+# Runtime-only image for hosts where the multi-stage build cannot run the JS toolchain
+# under amd64 emulation (esbuild crashes on Apple Silicon + Podman/qemu). Build the client and
+# server natively first (`npm ci && npm run build`), then:
+#   podman build --platform=linux/amd64 -f Dockerfile.prebuilt -t people_360:<tag> .
+# Produces the same runtime layout as Dockerfile's second stage.
+FROM node:20-bookworm-slim
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/package.json
+COPY server/package.json ./server/package.json
+RUN npm ci --omit=dev --workspace server --include-workspace-root
+COPY server/dist ./server/dist
+COPY client/dist ./client/dist
+ENV PORT=8080
+ENV CLIENT_DIST=/app/client/dist
+EXPOSE 8080
+CMD ["node", "server/dist/index.js"]

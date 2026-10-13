@@ -27,6 +27,34 @@ GRANT SELECT ON VIEW app_data.DT_RECRUITING TO APPLICATION ROLE app_public;
 CREATE OR REPLACE VIEW app_data.LINEAGE_COUNTS AS SELECT * FROM shared_data.LINEAGE_COUNTS;
 GRANT SELECT ON VIEW app_data.LINEAGE_COUNTS TO APPLICATION ROLE app_public;
 
+-- HR onboarding scenario: bundled reference data (demo enrichment, not SAP).
+CREATE OR REPLACE VIEW app_data.BENEFITS_PLAN AS SELECT * FROM shared_data.BENEFITS_PLAN;
+GRANT SELECT ON VIEW app_data.BENEFITS_PLAN TO APPLICATION ROLE app_public;
+CREATE OR REPLACE VIEW app_data.EQUIPMENT_KIT AS SELECT * FROM shared_data.EQUIPMENT_KIT;
+GRANT SELECT ON VIEW app_data.EQUIPMENT_KIT TO APPLICATION ROLE app_public;
+CREATE OR REPLACE VIEW app_data.IT_INVENTORY AS SELECT * FROM shared_data.IT_INVENTORY;
+GRANT SELECT ON VIEW app_data.IT_INVENTORY TO APPLICATION ROLE app_public;
+CREATE OR REPLACE VIEW app_data.PREFERRED_SOURCING AS SELECT * FROM shared_data.PREFERRED_SOURCING;
+GRANT SELECT ON VIEW app_data.PREFERRED_SOURCING TO APPLICATION ROLE app_public;
+
+-- onboarding schema (non-versioned, so rows survive upgrades): SIMULATED SuccessFactors write-back.
+CREATE SCHEMA IF NOT EXISTS onboarding;
+GRANT USAGE ON SCHEMA onboarding TO APPLICATION ROLE app_public;
+CREATE TABLE IF NOT EXISTS onboarding.SF_WRITEBACK_EMPHIRE (
+  REQUEST_ID VARCHAR, PERSON_ID_EXTERNAL VARCHAR, CANDIDATE_NAME VARCHAR, JOB_TITLE VARCHAR, DEPARTMENT VARCHAR, COMPANY VARCHAR,
+  PAY_GRADE NUMBER(38,0), ANNUAL_SALARY NUMBER(14,2), CURRENCY VARCHAR, START_DATE DATE, ODATA_PAYLOAD VARIANT, STATUS VARCHAR,
+  CREATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP())
+  COMMENT = 'SIMULATED write-back to SuccessFactors EC (EmpJob/EmpCompensation/PerPerson)';
+CREATE TABLE IF NOT EXISTS onboarding.SF_WRITEBACK_EQUIPMENT_REQUEST (
+  REQUEST_ID VARCHAR, LINE_NO NUMBER(38,0), ITEM_CODE VARCHAR, ITEM_NAME VARCHAR, QUANTITY NUMBER(38,0), FULFILLMENT VARCHAR,
+  SUPPLIER VARCHAR, UNIT_COST NUMBER(14,2), CURRENCY VARCHAR, EXPECTED_DATE DATE, STATUS VARCHAR, CREATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP())
+  COMMENT = 'SIMULATED onboarding equipment request lines';
+CREATE TABLE IF NOT EXISTS onboarding.SOURCING_DECISION (
+  REQUEST_ID VARCHAR, ITEM_CODE VARCHAR, PREFERRED VARIANT, ALTERNATIVES VARIANT, CHOSEN VARIANT, RATIONALE VARCHAR,
+  CREATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP())
+  COMMENT = 'Audit of the substitution decision';
+GRANT SELECT ON ALL TABLES IN SCHEMA onboarding TO APPLICATION ROLE app_public;
+
 -- Semantic view for Cortex Analyst, built over the bundled APP_DATA views.
 -- Mirrors SAP_PEOPLE_360.SEMANTIC.SAP_PEOPLE_360_ANALYTICS (SAP_PEOPLE_ANALYST).
 create or replace semantic view app_data.SAP_PEOPLE_360_ANALYTICS
@@ -76,6 +104,45 @@ INSERT INTO config.settings(key, value)
 CREATE SCHEMA IF NOT EXISTS services;
 GRANT USAGE ON SCHEMA services TO APPLICATION ROLE app_public;
 
+-- Onboarding scenario egress: web search + the retailer pages it returns. App-created EAI; usable once the
+-- consumer approves the EXTERNAL_ACCESS app specification. HOST_PORTS must match the network rule exactly.
+CREATE NETWORK RULE IF NOT EXISTS services.onboarding_web_rule
+  TYPE = HOST_PORT MODE = EGRESS
+  VALUE_LIST = ('html.duckduckgo.com', 'api.tavily.com', 'www.amazon.com', 'www.bestbuy.com', 'www.walmart.com', 'www.newegg.com', 'www.ebay.com', 'www.cdw.com', 'www.bhphotovideo.com', 'www.hp.com', 'www.dell.com', 'www.lenovo.com', 'www.microsoft.com', 'www.amazon.de', 'www.amazon.co.uk', 'www.amazon.fr', 'www.idealo.de', 'www.mediamarkt.de', 'www.notebooksbilliger.de', 'www.cyberport.de', 'www.amazon.co.jp', 'kakaku.com', 'www.yodobashi.com', 'www.biccamera.com');
+ALTER NETWORK RULE services.onboarding_web_rule SET VALUE_LIST = ('html.duckduckgo.com', 'api.tavily.com', 'www.amazon.com', 'www.bestbuy.com', 'www.walmart.com', 'www.newegg.com', 'www.ebay.com', 'www.cdw.com', 'www.bhphotovideo.com', 'www.hp.com', 'www.dell.com', 'www.lenovo.com', 'www.microsoft.com', 'www.amazon.de', 'www.amazon.co.uk', 'www.amazon.fr', 'www.idealo.de', 'www.mediamarkt.de', 'www.notebooksbilliger.de', 'www.cyberport.de', 'www.amazon.co.jp', 'kakaku.com', 'www.yodobashi.com', 'www.biccamera.com');
+CREATE EXTERNAL ACCESS INTEGRATION IF NOT EXISTS people_360_onboarding_web_eai
+  ALLOWED_NETWORK_RULES = (services.onboarding_web_rule)
+  ENABLED = TRUE;
+ALTER APPLICATION SET SPECIFICATION onboarding_web_spec
+  TYPE = EXTERNAL_ACCESS
+  LABEL = 'Onboarding: web search for equipment alternatives'
+  DESCRIPTION = 'When onboarding equipment is backordered, search the web and read retailer pages to find priced alternatives. No People data is sent.'
+  HOST_PORTS = ('html.duckduckgo.com', 'api.tavily.com', 'www.amazon.com', 'www.bestbuy.com', 'www.walmart.com', 'www.newegg.com', 'www.ebay.com', 'www.cdw.com', 'www.bhphotovideo.com', 'www.hp.com', 'www.dell.com', 'www.lenovo.com', 'www.microsoft.com', 'www.amazon.de', 'www.amazon.co.uk', 'www.amazon.fr', 'www.idealo.de', 'www.mediamarkt.de', 'www.notebooksbilliger.de', 'www.cyberport.de', 'www.amazon.co.jp', 'kakaku.com', 'www.yodobashi.com', 'www.biccamera.com');
+
+-- callbacks schema: app-specification approval restarts the service so the new egress applies
+CREATE SCHEMA IF NOT EXISTS callbacks;
+GRANT USAGE ON SCHEMA callbacks TO APPLICATION ROLE app_public;
+CREATE OR REPLACE PROCEDURE callbacks.on_spec_approved_or_declined(name STRING, status STRING, payload STRING)
+  RETURNS STRING LANGUAGE SQL EXECUTE AS OWNER
+AS $$
+BEGIN
+  IF (:status = 'APPROVED') THEN
+    BEGIN
+      ALTER SERVICE services.people_360_service SET EXTERNAL_ACCESS_INTEGRATIONS = (people_360_onboarding_web_eai);
+      ALTER SERVICE services.people_360_service SUSPEND;
+    EXCEPTION WHEN OTHER THEN NULL;
+    END;
+    BEGIN
+      ALTER SERVICE services.people_360_service RESUME;
+      CALL SYSTEM$WAIT_FOR_SERVICES(600, 'services.people_360_service');
+    EXCEPTION WHEN OTHER THEN NULL;
+    END;
+  END IF;
+  RETURN 'on_spec_approved_or_declined: ' || :name || ' ' || :status;
+END;
+$$;
+GRANT USAGE ON PROCEDURE callbacks.on_spec_approved_or_declined(STRING, STRING, STRING) TO APPLICATION ROLE app_public;
+
 -- core schema (versioned): lifecycle + service management
 CREATE OR ALTER VERSIONED SCHEMA core;
 GRANT USAGE ON SCHEMA core TO APPLICATION ROLE app_public;
@@ -108,11 +175,17 @@ BEGIN
     CREATE SERVICE services.people_360_service
       IN COMPUTE POOL IDENTIFIER(:pool_name)
       FROM SPECIFICATION_FILE = '/service_spec.yml'
+      EXTERNAL_ACCESS_INTEGRATIONS = (people_360_onboarding_web_eai)
       MIN_INSTANCES = 1 MAX_INSTANCES = 1;
     GRANT USAGE ON SERVICE services.people_360_service TO APPLICATION ROLE app_public;
     GRANT SERVICE ROLE services.people_360_service!people_360_role TO APPLICATION ROLE app_public;
   ELSE
     ALTER SERVICE services.people_360_service FROM SPECIFICATION_FILE = '/service_spec.yml';
+    -- Egress for the onboarding scenario; harmless if the consumer has not approved the spec yet.
+    BEGIN
+      ALTER SERVICE services.people_360_service SET EXTERNAL_ACCESS_INTEGRATIONS = (people_360_onboarding_web_eai);
+    EXCEPTION WHEN OTHER THEN NULL;
+    END;
     CALL SYSTEM$WAIT_FOR_SERVICES(600, 'services.people_360_service');
   END IF;
   RETURN 'version_init ok';

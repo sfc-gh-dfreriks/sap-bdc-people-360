@@ -1,8 +1,8 @@
 manifest_version: 2
 
 version:
-  name: v1
-  label: "People 360 v1 (self-contained)"
+  name: v2
+  label: "People 360 v2 (self-contained, HR onboarding scenario)"
   comment: "SAP People 360 dashboard (React + Express on SPCS) with bundled data and the SAP_PEOPLE_360_ANALYTICS Cortex Analyst semantic view."
 
 configuration:
@@ -26,6 +26,9 @@ privileges:
       description: "Expose the dashboard web UI endpoint."
   - CREATE WAREHOUSE:
       description: "Create a warehouse used to query the bundled People data."
+  - CREATE EXTERNAL ACCESS INTEGRATION:
+      description: "Onboarding scenario: search the web and read retailer pages for laptop alternatives when equipment is backordered."
 
 lifecycle_callbacks:
   version_initializer: core.version_init
+  specification_action: callbacks.on_spec_approved_or_declined

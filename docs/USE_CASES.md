@@ -16,6 +16,7 @@
 | 5 | Critical roles and succession | Talent management | Performance; Employees |
 | 6 | Hiring pipeline | Talent acquisition | Recruiting |
 | 7 | Learning and performance | L&D / people managers | Learning; Performance |
+| 8 | New-hire onboarding and equipment readiness | HR operations / IT asset management | Onboarding Scenario |
 
 ## 1. Headcount and FTE planning
 
@@ -86,6 +87,16 @@
 - **Ask the agent:**
   - "Which departments have the most employees in critical positions?"
 - **Value:** Directs development spend to impact.
+
+## 8. New-hire onboarding and equipment readiness
+
+- **Persona:** HR operations / IT asset management / procurement
+- **Business question:** Will a new starter be productive on day one, and if equipment is late, what is the cheapest way to fix it once idle time is counted?
+- **Where in the app:** Onboarding Scenario
+- **Data used:** DT_WORKFORCE_360 (peer pay, grade, company) from the SAP BDC share; ONBOARDING.BENEFITS_PLAN, EQUIPMENT_KIT, IT_INVENTORY, PREFERRED_SOURCING (demo enrichment); live web search + Cortex AI_COMPLETE
+- **Example:** Senior Engineer, US Operations — $127,200 from 36 peers; Engineering laptop 16" 42 days out → 17 idle workdays ≈ $10,812
+- **Ask the agent:** not covered — the agent's semantic view is workforce-only; the scenario runs on the page.
+- **Value:** Turns a backorder from an IT ticket into a costed decision, and closes the loop to SuccessFactors (simulated write-back).
 
 ---
 Example agent questions are suggested prompts; validate answers in the app before customer demos.

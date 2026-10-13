@@ -58,3 +58,15 @@ schema (no consumer references), and an in-app copy of the
 `SAP_PEOPLE_360_ANALYTICS` semantic view powers the Cortex Analyst page. The
 React client + Express server run on **Snowpark Container Services**. See
 [`app/`](../app) and [`INSTALL.md`](INSTALL.md).
+
+## Onboarding scenario
+
+```
+DT_WORKFORCE_360 (BDC share) ──► template: peer pay, grade, loaded daily cost
+ONBOARDING.* reference (demo) ──► kit check: stock, preferred channel, lead time, idle days
+web search (Tavily | DuckDuckGo + page fetch) ──► Cortex AI_COMPLETE ──► priced offers (cited page must carry the price)
+choice ──► ONBOARDING.SF_WRITEBACK_* + SOURCING_DECISION   (simulated SuccessFactors OData write-back)
+```
+
+In the Native App the egress runs through an app-created external access integration that the
+consumer approves; the public github.io build replays one recorded run instead.

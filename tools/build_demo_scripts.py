@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build 02_Demo_Scripts_by_Persona.docx for SAP People 360.
 
-Six standalone scripts. They are not variants of one walkthrough: each opens on a
+Seven standalone scripts. They are not variants of one walkthrough: each opens on a
 different page, lands a different number, and expects different pushback. Pick the
 one that matches the room.
 
@@ -21,6 +21,7 @@ from docx.shared import Pt
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
+import onboarding_content as onb  # noqa: E402
 from docx_kit import (  # noqa: E402
     GREY, SAP_NAVY, SNOW_BLUE, body, bullet, callout, h1, h2, setup_page, table,
 )
@@ -83,7 +84,7 @@ def main() -> int:
         doc,
         "SAP People 360",
         "Demo scripts by persona",
-        f"{DATE}   ·   Six scripts, one per audience",
+        f"{DATE}   ·   Seven scripts, one per audience",
     )
 
     body(
@@ -337,6 +338,36 @@ def main() -> int:
              "Masking policies on compensation columns, row access policies keyed to the "
              "manager hierarchy, and a role model that separates HR business partners "
              "from analysts. That is a design exercise, and it is the right next step."),
+        ],
+    )
+
+    # ------------------------------------------------------------ 7. HR Operations onboarding
+    oh, ok, orp = onb.facts(F)
+    script(
+        doc, 7, "HR Operations / People Ops (onboarding)", 6, "HR operations, IT asset management, procurement",
+        "This is the action script. The other pages report on the workforce; this one makes a hire, hits a "
+        "supply-chain problem and fixes it — so lead with the new starter's first day, not with dashboards.",
+        [[a, b, t] for (a, b), t in zip(onb.talk_track(F), ["1 min", "1 min", "1 min", "2 min", "1 min"])],
+        [
+            f"{onb.m(oh['salary'])} offer from {oh['peers']} peers · {onb.m(oh['daily_loaded'])} loaded cost per idle day",
+            f"{ok['blocked_item']}: {ok['lead_days']}-day backorder → {ok['lost_workdays']} idle workdays ≈ {onb.m(ok['idle_cost'])}",
+            "Offers kept only when the price is on the cited page",
+        ],
+        "A backordered laptop stops being an IT ticket and becomes a costed decision — made in a minute, "
+        "with the reasoning and the write-back on the same governed data.",
+        [
+            ("Is the write-back real?",
+             "Simulated in this demo: the SuccessFactors OData payloads (PerPerson, EmpJob, EmpCompensation, the "
+             "equipment request) are stored in Snowflake. Wiring it to a tenant is an integration step, not a rebuild."),
+            ("Where do the laptop prices come from?",
+             "A live web search, read by Cortex AI_COMPLETE. Every offer links to its source page; if the price is not "
+             "on that page the offer is dropped. Results change each run, so never quote one from memory."),
+            ("Is the inventory and supplier data from SAP?",
+             "No — benefits, kits, IT stock and preferred sourcing are demo enrichment. The hire's pay band and peer group "
+             "come from the SAP BDC workforce share."),
+            ("Does this need internet access in the Native App?",
+             "Yes, for the search only. The app asks for an external-access approval limited to the search endpoint and "
+             "a fixed list of retailer sites. Decline it and everything else still works."),
         ],
     )
 
