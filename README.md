@@ -33,6 +33,12 @@ Performance, Learning, Recruiting, Org, Employees, Lineage**, plus an **Ask the
 Agent** page (Cortex Analyst over the bundled `SAP_PEOPLE_360_ANALYTICS` view) and an
 **Onboarding Scenario**.
 
+**Ask Cortex** is the first sidebar item, and every data page has an **Ask Cortex
+about <page>** button with two suggested questions. The server gathers live facts
+for that page from the app's own tables and asks Snowflake Cortex (`AI_COMPLETE`, default `claude-sonnet-4-5`, override with `CORTEX_MODEL`) for a markdown analysis
+(background job, polled every 2 s via `POST/GET /api/ask-cortex`). Ask the Agent is
+unchanged. The presales kit (DOCX/PPTX/video) predates Ask Cortex and is out of date.
+
 ### HR onboarding scenario
 A hire made from SuccessFactors data meets a supply-chain disruption, and the app fixes it:
 

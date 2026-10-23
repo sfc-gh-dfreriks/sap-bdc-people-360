@@ -1,17 +1,18 @@
 import {
   LayoutDashboard, Users, PieChart, DollarSign, TrendingDown, Network, Table2, Bot, Check,
-  Star, GraduationCap, UserPlus, GitBranch, UserCog,
+  Star, GraduationCap, UserPlus, GitBranch, UserCog, Sparkles,
 } from 'lucide-react';
 import { useFilters } from '@/hooks/useFilters';
 import { cn } from '@/lib/utils';
 
 export type PageId =
-  | 'overview' | 'headcount' | 'diversity' | 'compensation'
+  | 'askcortex' | 'overview' | 'headcount' | 'diversity' | 'compensation'
   | 'attrition' | 'org' | 'performance' | 'learning' | 'recruiting' | 'onboarding' | 'employees' | 'lineage' | 'analyst';
 
 export interface NavItem { id: PageId; label: string; icon: React.ElementType; }
 
 export const NAV_ITEMS: NavItem[] = [
+  { id: 'askcortex', label: 'Ask Cortex', icon: Sparkles },
   { id: 'overview', label: 'Workforce Overview', icon: LayoutDashboard },
   { id: 'headcount', label: 'Headcount', icon: Users },
   { id: 'diversity', label: 'Diversity & Inclusion', icon: PieChart },

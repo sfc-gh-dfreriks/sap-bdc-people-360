@@ -31,6 +31,7 @@ full SAP business context preserved.
               ▼                                        ▼
    SAP_PEOPLE_ANALYST agent                 Native App "Ask the Agent"
    (Snowflake Intelligence)                 (Cortex Analyst in-app)
+                                            + "Ask Cortex" (page facts → COMPLETE)
                                                         │
                                             React + Express on SPCS
 ```

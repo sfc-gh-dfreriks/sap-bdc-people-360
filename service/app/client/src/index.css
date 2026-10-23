@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ask Cortex markdown answers */
+.cortex-md { @apply text-sm leading-relaxed text-gray-700; }
+.cortex-md p { @apply my-2; }
+.cortex-md h1, .cortex-md h2, .cortex-md h3 { @apply mt-3 mb-1 font-semibold text-sf-deeper; }
+.cortex-md ul { @apply my-2 list-disc pl-5; }
+.cortex-md ol { @apply my-2 list-decimal pl-5; }
+.cortex-md strong { @apply font-semibold text-gray-900; }
+.cortex-md code { @apply rounded bg-gray-100 px-1 text-xs; }
+.cortex-md table { @apply my-2 w-full border-collapse text-xs; }
+.cortex-md th, .cortex-md td { @apply border border-gray-200 px-2 py-1 text-left; }
+.cortex-md th { @apply bg-gray-50 font-semibold; }

@@ -84,6 +84,9 @@ Locator: `ORGDATACLOUD$INTERNAL$PEOPLE_360_ORG`.
 ```sql
 GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO APPLICATION PEOPLE_360_APP;
 ```
+Needed by Ask the Agent (Cortex Analyst) and Ask Cortex (`SNOWFLAKE.CORTEX.COMPLETE`,
+model `claude-sonnet-4-5`; enable cross-region inference if it is not in your region).
+Without it, Ask Cortex shows "not available in this installation" rather than failing.
 
 ## Teardown
 ```sql

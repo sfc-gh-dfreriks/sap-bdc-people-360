@@ -18,6 +18,8 @@
 | 7 | Learning and performance | L&D / people managers | Learning; Performance |
 | 8 | New-hire onboarding and equipment readiness | HR operations / IT asset management | Onboarding Scenario |
 
+Every row can also start from **Ask Cortex** (first page, or the "Ask Cortex about <page>" button), which summarises the page's live facts with Cortex.
+
 ## 1. Headcount and FTE planning
 
 - **Persona:** CHRO / HR business partner

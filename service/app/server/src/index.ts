@@ -8,6 +8,7 @@ dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
 import express from "express";
 import cors from "cors";
 import apiRouter from "./routes/api.js";
+import askCortexRouter from "./routes/askCortex.js";
 import onboardingRouter from "./routes/onboarding.js";
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.get("/healthcheck", (_req, res) => res.status(200).send("ok"));
 
 app.use(apiRouter);
+app.use(askCortexRouter);
 app.use(onboardingRouter);
 
 // Serve the built React client when packaged in the container.

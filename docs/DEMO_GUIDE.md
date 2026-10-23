@@ -11,6 +11,8 @@ no pipelines, full SAP context preserved.
 
 ## 10-minute flow
 1. **Open the app** — no setup; data is already inside (bundled Native App).
+   It opens on **Ask Cortex**: click *Run workforce briefing* for a Cortex-written summary.
+   Each page below also has an **Ask Cortex about <page>** button — use it on Attrition.
 2. **Overview** — headcount, attrition and diversity KPIs.
 3. **Headcount & Org** — by department, division, location; span of control.
 4. **Diversity & Compensation** — gender/generation mix, pay equity, top earners.
