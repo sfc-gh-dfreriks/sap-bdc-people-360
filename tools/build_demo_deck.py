@@ -375,8 +375,8 @@ def s11c_sourcing(prs, f, shots):
 def s12_agent(prs, f, shots):
     sv = next(iter(f["semantic_view_detail"].values()))
     s = content(prs, "Ask the agent in Snowflake Intelligence", "Plain English, with the SQL shown")
-    if "analyst" in shots:
-        picture(s, shots["analyst"], LEFT, TOP, 5.5, 3.4)
+    if "askcortex" in shots:
+        picture(s, shots["askcortex"], LEFT, TOP, 5.5, 3.4)
     qs = f["agent_questions"][:5]
     stack(s, LEFT + 5.75, TOP - 0.02, 3.4, 1.85,
           [(f"· {q}", 9.5, False, DK1, 5) for q in qs])

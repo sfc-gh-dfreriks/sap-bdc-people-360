@@ -277,7 +277,7 @@ def s07_agent(prs, f, shots):
     sv = next(iter(f["semantic_view_detail"].values()))
     s = content(prs, "Plain-English questions, governed SQL underneath",
                 "Eight questions ship — every one a workforce question")
-    picture(s, shots["analyst"], LEFT, TOP, 5.5, 3.5)
+    picture(s, shots["askcortex"], LEFT, TOP, 5.5, 3.5)
     qs = f["agent_questions"]
     stack(s, LEFT + 5.75, TOP - 0.02, 3.4, 2.4,
           [(f"· {q}", 9.5, False, DK1, 5) for q in qs])
