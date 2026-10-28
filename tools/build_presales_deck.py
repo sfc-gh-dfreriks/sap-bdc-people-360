@@ -232,7 +232,7 @@ def s04_app(prs, f, shots):
     stack(s, LEFT + 7.65, TOP + 0.30, 1.5, 3.0,
           [(f"· {p}", 9.5, False, DK1, 6) for p in pages[half:]])
     note(s, "New: Onboarding Scenario — hire, backordered laptop, live web sourcing, simulated "
-            "SuccessFactors write-back. Shown: Workforce Overview.")
+            "SuccessFactors write-back. Shown: Executive Dashboard.")
     return s
 
 

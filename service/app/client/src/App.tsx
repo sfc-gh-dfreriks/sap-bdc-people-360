@@ -13,7 +13,6 @@ import Recruiting from '@/pages/Recruiting';
 import Onboarding from '@/pages/Onboarding';
 import Employees from '@/pages/Employees';
 import Lineage from '@/pages/Lineage';
-import Analyst from '@/pages/Analyst';
 import AskCortexPage from '@/pages/AskCortexPage';
 import AskCortex from '@/components/AskCortex';
 
@@ -46,7 +45,6 @@ const PAGE_COMPONENTS: Record<string, React.FC> = {
   onboarding: Onboarding,
   employees: Employees,
   lineage: Lineage,
-  analyst: Analyst,
 };
 
 function AppShell() {

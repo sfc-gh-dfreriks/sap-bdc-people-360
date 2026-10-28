@@ -15,7 +15,6 @@ export default function AskCortexPage() {
       <p className="text-sm text-gray-600">
         Ask Cortex reads a live, cross-functional fact set from SAP_PEOPLE_360 — workforce, compensation, attrition,
         performance, learning and recruiting from SAP SuccessFactors via SAP BDC — and answers using only those facts.
-        For ad-hoc SQL over the semantic view, use <span className="font-medium">Ask the Agent</span>.
       </p>
       <AskCortex topic="general" label="Run workforce briefing" suggestions={SUGGESTIONS} startOpen />
     </div>

@@ -47,7 +47,8 @@ FACTS_FILE = pathlib.Path("/tmp/people_facts.json")
 DATE = date.today().strftime("%d %B %Y")
 
 PAGE_PURPOSE = {
-    "Workforce Overview": "Active headcount, attrition, average salary, gender split",
+    "Ask Cortex": "Cortex-written analysis of any page's live numbers",
+    "Executive Dashboard": "Active headcount, attrition, average salary, gender split",
     "Headcount": "Headcount by department, company, tenure and age band",
     "Diversity & Inclusion": "Gender and generation mix, representation by department",
     "Compensation": "Salary distribution, compa-ratio against range midpoint",
@@ -59,7 +60,6 @@ PAGE_PURPOSE = {
     "Org & Span": "Manager span of control and reporting depth",
     "Employees": "The record-level table, filterable",
     "BDC Sources & Lineage": "Which SAP BDC objects feed each layer",
-    "Ask the Agent": "Natural-language questions over the workforce semantic view",
 }
 
 
@@ -110,7 +110,7 @@ def agent_scope_callout(doc, F):
     callout(
         doc,
         "The one limitation to know",
-        f"Ask the Agent answers on workforce only. The semantic view carries a "
+        f"The SAP_PEOPLE_ANALYST agent (Snowflake Intelligence) answers on workforce only. The semantic view carries a "
         f"single table ({', '.join(sv['table_names'])}) with {sv['dimensions']} "
         f"dimensions and {sv['facts']} facts — so headcount, attrition, "
         f"compensation, diversity and tenure all work, but performance, learning "
@@ -285,7 +285,7 @@ def build_quick_start(F):
             ["1", "—",
              "Open the app cold. Say: nothing installed, nothing loaded, and this is "
              "synthetic workforce data modelled on real SuccessFactors structure.", "1 min"],
-            ["2", "Workforce Overview",
+            ["2", "Executive Dashboard",
              f"{k['active_headcount']:,} active, {k['attrition_pct']}% attrition, "
              f"${k['avg_salary']:,} average base, {k['pct_female']}% female. Say these "
              f"are SAP's definitions, not ones we invented downstream.", "1 min"],
@@ -301,7 +301,8 @@ def build_quick_start(F):
             ["6", "Org & Span",
              f"Span of control, with {F['critical_positions']} critical positions "
              f"flagged. Good bridge to succession-risk conversations.", "1 min"],
-            ["7", "Ask the Agent",
+            ["7", "Snowflake Intelligence",
+             "Switch to SAP_PEOPLE_ANALYST in Snowflake Intelligence (no in-app agent page). "
              "Ask one of the eight built-in questions live, then expand the generated "
              "SQL — governed and explainable, not a black box.", "2 min"],
             ["8", "BDC Sources & Lineage",
@@ -439,7 +440,7 @@ def build_architecture(F):
              f"{sv['verified_queries']} verified queries."],
             ["Agent", F["agents"][0].split(".", 1)[1] if F["agents"] else "—",
              "Cortex Agent for natural-language workforce questions, and the model "
-             "behind the app's Ask the Agent page."],
+             "queried in Snowflake Intelligence (the app has no agent page)."],
             ["App", f"{F['app_page_count']} pages",
              "React client and Express server, packaged as a Native App."],
         ],
@@ -572,7 +573,7 @@ def build_setup(F):
              "bundled in. No grants, no warehouse sizing, no data setup.",
              f"{F['app_listing']} — region-scoped, install the one for your region"],
             ["Public static build", "A credential-free browser build for rehearsal or "
-             "async sharing. No Snowflake behind it, so Ask the Agent will not answer and "
+             "async sharing. No Snowflake behind it, so Ask Cortex shows pre-baked answers only and "
              "the onboarding scenario replays one recorded run.",
              F["public_url"]],
             ["Your own account", "Run the SQL, then demo through Snowflake "

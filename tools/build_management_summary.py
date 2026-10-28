@@ -196,8 +196,8 @@ def main() -> int:
         doc,
         ["Role", "Question they bring", "Where they start"],
         [
-            ["CHRO / HR Director", "Where is our retention risk, and what is it costing?", "Workforce Overview"],
-            ["People Analytics lead", "Can I answer new questions without an extract?", "Ask the Agent"],
+            ["CHRO / HR Director", "Where is our retention risk, and what is it costing?", "Executive Dashboard"],
+            ["People Analytics lead", "Can I answer new questions without an extract?", "Snowflake Intelligence (SAP_PEOPLE_ANALYST)"],
             ["Total Rewards", "Is pay where the grade says it should be?", "Compensation"],
             ["Talent Acquisition", "Which critical roles are exposed, and what is open?", "Recruiting, Org and Span"],
             ["Finance business partner", "What does workforce cost look like by unit?", "Headcount, Compensation"],

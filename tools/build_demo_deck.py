@@ -251,11 +251,11 @@ def s05_numbers(prs, f):
 def s06_flow(prs):
     s = content(prs, "Demo flow", "About ten minutes, opening on the question HR actually brings")
     grid(s, [
-        ("1 · Workforce Overview", "headcount, attrition, pay and gender in one screen"),
+        ("1 · Executive Dashboard", "headcount, attrition, pay and gender in one screen"),
         ("2 · Attrition", "where it is concentrated, by reason and department"),
         ("3 · Compensation", "compa-ratio against the band SAP already holds"),
         ("4 · Org & Span", "critical positions — succession exposure made visible"),
-        ("5 · Ask the Agent", "a plain-English question, with the SQL shown"),
+        ("5 · Snowflake Intelligence", "the SAP_PEOPLE_ANALYST agent, with the SQL shown"),
         ("6 · BDC Sources & Lineage", "the zero-copy proof, inside the app"),
     ], y0=TOP, rh=0.52)
     note(s, "Say the data is synthetic in the first minute. On HR data, do not wait to be challenged on it.")
@@ -264,19 +264,19 @@ def s06_flow(prs):
 
 def s07_walkthrough_section(prs):
     return section(
-        prs, "LIVE DEMO WALKTHROUGH", "Twelve pages, six acts",
-        ["Workforce Overview — the headline numbers",
+        prs, "LIVE DEMO WALKTHROUGH", "Six acts across the app",
+        ["Executive Dashboard — the headline numbers",
          "Attrition — where retention risk sits",
          "Compensation — pay against the band",
          "Org & Span — succession exposure",
-         "Ask the Agent — natural language, and its limit",
+         "Snowflake Intelligence — the agent, and its limit",
          "Sources & Lineage — zero copy, visible in the app"],
     )
 
 
 def s08_overview_page(prs, f, shots):
     k = f["kpis"]
-    s = content(prs, "Workforce Overview", "One screen, and the questions it already answers")
+    s = content(prs, "Executive Dashboard", "One screen, and the questions it already answers")
     if "overview" in shots:
         picture(s, shots["overview"], LEFT, TOP, 5.9, 3.4)
     x = LEFT + 6.1
@@ -374,7 +374,7 @@ def s11c_sourcing(prs, f, shots):
 
 def s12_agent(prs, f, shots):
     sv = next(iter(f["semantic_view_detail"].values()))
-    s = content(prs, "Ask the Agent", "Plain English, with the SQL shown")
+    s = content(prs, "Ask the agent in Snowflake Intelligence", "Plain English, with the SQL shown")
     if "analyst" in shots:
         picture(s, shots["analyst"], LEFT, TOP, 5.5, 3.4)
     qs = f["agent_questions"][:5]

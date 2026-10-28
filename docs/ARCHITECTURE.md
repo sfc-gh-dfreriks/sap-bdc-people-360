@@ -29,9 +29,8 @@ full SAP business context preserved.
  └──────────────────────────────────────────────────────────────────────────┘
               │                                        │
               ▼                                        ▼
-   SAP_PEOPLE_ANALYST agent                 Native App "Ask the Agent"
-   (Snowflake Intelligence)                 (Cortex Analyst in-app)
-                                            + "Ask Cortex" (page facts → COMPLETE)
+   SAP_PEOPLE_ANALYST agent                 Native App "Ask Cortex"
+   (Snowflake Intelligence)                 (page facts → COMPLETE)
                                                         │
                                             React + Express on SPCS
 ```
@@ -56,7 +55,9 @@ full SAP business context preserved.
 For distribution the app is packaged as a **self-contained Snowflake Native
 App**: the 4 tables the UI needs are **bundled** into the package's `SHARED_DATA`
 schema (no consumer references), and an in-app copy of the
-`SAP_PEOPLE_360_ANALYTICS` semantic view powers the Cortex Analyst page. The
+`SAP_PEOPLE_360_ANALYTICS` semantic view is bundled with the app. The app opens on the Executive
+Dashboard, second in the menu beneath Ask Cortex; there is no in-app agent page
+(ask `SAP_PEOPLE_ANALYST` in Snowflake Intelligence). The
 React client + Express server run on **Snowpark Container Services**. See
 [`app/`](../app) and [`INSTALL.md`](INSTALL.md).
 

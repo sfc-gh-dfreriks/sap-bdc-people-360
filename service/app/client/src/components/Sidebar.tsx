@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Users, PieChart, DollarSign, TrendingDown, Network, Table2, Bot, Check,
+  LayoutDashboard, Users, PieChart, DollarSign, TrendingDown, Network, Table2, Check,
   Star, GraduationCap, UserPlus, GitBranch, UserCog, Sparkles,
 } from 'lucide-react';
 import { useFilters } from '@/hooks/useFilters';
@@ -7,13 +7,13 @@ import { cn } from '@/lib/utils';
 
 export type PageId =
   | 'askcortex' | 'overview' | 'headcount' | 'diversity' | 'compensation'
-  | 'attrition' | 'org' | 'performance' | 'learning' | 'recruiting' | 'onboarding' | 'employees' | 'lineage' | 'analyst';
+  | 'attrition' | 'org' | 'performance' | 'learning' | 'recruiting' | 'onboarding' | 'employees' | 'lineage';
 
 export interface NavItem { id: PageId; label: string; icon: React.ElementType; }
 
 export const NAV_ITEMS: NavItem[] = [
   { id: 'askcortex', label: 'Ask Cortex', icon: Sparkles },
-  { id: 'overview', label: 'Workforce Overview', icon: LayoutDashboard },
+  { id: 'overview', label: 'Executive Dashboard', icon: LayoutDashboard },
   { id: 'headcount', label: 'Headcount', icon: Users },
   { id: 'diversity', label: 'Diversity & Inclusion', icon: PieChart },
   { id: 'compensation', label: 'Compensation', icon: DollarSign },
@@ -25,7 +25,6 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'org', label: 'Org & Span', icon: Network },
   { id: 'employees', label: 'Employees', icon: Table2 },
   { id: 'lineage', label: 'BDC Sources & Lineage', icon: GitBranch },
-  { id: 'analyst', label: 'Ask the Agent', icon: Bot },
 ];
 
 interface SidebarProps { activePage: PageId; onNavigate: (page: PageId) => void; }

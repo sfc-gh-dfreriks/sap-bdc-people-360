@@ -43,7 +43,8 @@ DATE = date.today().strftime("%d %B %Y")
 CONTACT = "dave.freriks@snowflake.com"
 
 PAGE_PURPOSE = {
-    "Workforce Overview": "Active headcount, attrition, average salary, gender split",
+    "Ask Cortex": "Cortex-written analysis of any page's live numbers",
+    "Executive Dashboard": "Active headcount, attrition, average salary, gender split",
     "Headcount": "Headcount by department, company, tenure and age band",
     "Diversity & Inclusion": "Gender and generation mix, representation by department",
     "Compensation": "Salary distribution and compa-ratio against range midpoint",
@@ -55,7 +56,6 @@ PAGE_PURPOSE = {
     "Org & Span": "Manager span of control and reporting depth",
     "Employees": "The record-level table, filterable",
     "BDC Sources & Lineage": "Which SAP BDC objects feed each layer",
-    "Ask the Agent": "Natural-language questions over the workforce semantic view",
 }
 
 
@@ -267,7 +267,7 @@ def main() -> int:
         [
             ["Agent", F["agents"][0] if F["agents"] else "—"],
             ["Semantic view", F.get("analyst_semantic_view") or sv_fqn],
-            ["In-app surface", "The Ask the Agent page, via Cortex Analyst"],
+            ["In-app surface", "None — the in-app agent page was removed; use Ask Cortex in the app"],
             ["Snowsight route", "AI/ML → Snowflake Intelligence → SAP People Analyst"],
         ],
         widths=[1.6, 5.1],

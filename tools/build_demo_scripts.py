@@ -106,7 +106,7 @@ def main() -> int:
         "The flagship script. It stays on the business question — where is retention "
         "risk and what is exposed — and never mentions a table name.",
         [
-            ["Workforce Overview",
+            ["Executive Dashboard",
              f"Open on the headline: {k['active_headcount']:,} active, {k['attrition_pct']}% "
              f"attrition, ${k['avg_salary']:,} average base. Say these are SAP's own "
              f"definitions, not ones rebuilt in a spreadsheet.", "1 min"],
@@ -120,7 +120,7 @@ def main() -> int:
             ["Compensation",
              f"Compa-ratio average {F['avg_compa_ratio']}. Pay equity is usually the "
              f"question behind the retention question.", "1 min"],
-            ["Ask the Agent",
+            ["Snowflake Intelligence (SAP_PEOPLE_ANALYST)",
              "Ask one question live — attrition rate by division works well — and show "
              "the SQL. The point is that HR can ask, not wait.", "2 min"],
         ],
@@ -151,9 +151,9 @@ def main() -> int:
         "This persona does the work today and will judge whether it removes their "
         "bottleneck. Spend the time on the agent and on lineage.",
         [
-            ["Ask the Agent",
-             "Open here, not on the dashboard. Read one of the eight built-in questions, "
-             "then type a variation of your own and expand the generated SQL.", "3 min"],
+            ["Snowflake Intelligence (SAP_PEOPLE_ANALYST)",
+             "Open here, not on the app dashboard (the app has no agent page). Ask one of "
+             "the eight built-in questions, then type a variation of your own and expand the generated SQL.", "3 min"],
             ["BDC Sources & Lineage",
              "Show which SAP BDC objects feed each layer. This is the answer to 'where "
              "did this number come from', which is their daily problem.", "2 min"],
@@ -200,7 +200,7 @@ def main() -> int:
             ["Diversity & Inclusion",
              f"Pay and representation together — {k['pct_female']}% female overall. "
              f"Present it without editorialising; the value is that it is measurable.", "2 min"],
-            ["Ask the Agent",
+            ["Snowflake Intelligence (SAP_PEOPLE_ANALYST)",
              "Ask average salary by pay grade and gender. It is one of the eight built-in "
              "questions, so it will answer cleanly.", "1 min"],
         ],
@@ -306,7 +306,7 @@ def main() -> int:
             ["BDC Sources & Lineage",
              "Open here. Zero copy from the BDC share, an L1 view, then the analytics "
              "layer. No pipeline and no second copy of employee data.", "2 min"],
-            ["Ask the Agent",
+            ["Snowflake Intelligence (SAP_PEOPLE_ANALYST)",
              "Expand the generated SQL. The agent is bound to a semantic view, not "
              "pointed at raw tables.", "2 min"],
             ["Employees",

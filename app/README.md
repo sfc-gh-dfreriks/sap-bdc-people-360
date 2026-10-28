@@ -13,13 +13,15 @@ workforce dashboard (React + Express) on Snowpark Container Services.
   write-back is simulated: payloads are stored in the app's `ONBOARDING` schema.
 - **Bundled data** — All workforce data is packaged with the app (no external
   references or shares). It runs immediately after install.
+- **Navigation** — Ask Cortex is first in the menu, then the Executive Dashboard,
+  which is where the app opens.
 - **Ask Cortex** — The first page, plus an "Ask Cortex about <page>" button on
   every data page. Facts are read from the bundled data and summarised by Cortex
   `COMPLETE` (`claude-sonnet-4-5`). Without Cortex access it shows a "not available
   in this installation" message instead of an error.
-- **Ask the Agent** — A natural-language analytics page powered by Cortex
-  Analyst over the bundled **`SAP_PEOPLE_360_ANALYTICS`** semantic view — the
-  same model behind the account-level **`SAP_PEOPLE_ANALYST`** Cortex Agent.
+- **Semantic view** — The bundled **`SAP_PEOPLE_360_ANALYTICS`** semantic view is
+  the same model behind the account-level **`SAP_PEOPLE_ANALYST`** Cortex Agent; ask
+  that agent free-form questions in Snowflake Intelligence (there is no in-app agent page).
 
 ## Data model
 
@@ -40,7 +42,7 @@ headcount, attrition, diversity, compensation, tenure and org structure.
 
 ## Cortex access
 
-Grant the app the `SNOWFLAKE.CORTEX_USER` database role so the "Ask the Agent"
-and "Ask Cortex" pages can call Cortex Analyst and `COMPLETE`. The model must be
+Grant the app the `SNOWFLAKE.CORTEX_USER` database role so Ask Cortex
+can call `COMPLETE`. The model must be
 available in your region, or cross-region inference enabled
 (`ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION'`).

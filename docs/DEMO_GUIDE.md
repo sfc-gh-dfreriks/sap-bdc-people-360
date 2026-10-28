@@ -11,14 +11,15 @@ no pipelines, full SAP context preserved.
 
 ## 10-minute flow
 1. **Open the app** — no setup; data is already inside (bundled Native App).
-   It opens on **Ask Cortex**: click *Run workforce briefing* for a Cortex-written summary.
-   Each page below also has an **Ask Cortex about <page>** button — use it on Attrition.
-2. **Overview** — headcount, attrition and diversity KPIs.
+   It opens on the **Executive Dashboard** (second in the menu). **Ask Cortex**, first in
+   the menu: click *Run workforce briefing* for a Cortex-written summary. Each page below
+   also has an **Ask Cortex about <page>** button — use it on Attrition.
+2. **Executive Dashboard** — headcount, attrition and diversity KPIs.
 3. **Headcount & Org** — by department, division, location; span of control.
 4. **Diversity & Compensation** — gender/generation mix, pay equity, top earners.
 5. **Attrition** — terminations, reasons, tenure bands.
 6. **Performance / Learning / Recruiting** — ratings, high-potentials, hiring funnel.
-7. **Ask the Agent** — live questions to `SAP_PEOPLE_ANALYST`:
+7. **Snowflake Intelligence** — live questions to `SAP_PEOPLE_ANALYST` (no in-app agent page):
    - "What is headcount by department?"
    - "What is our attrition rate and top termination reasons?"
    - "Show pay equity by gender and pay grade."
